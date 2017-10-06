@@ -2,7 +2,7 @@ from calibre.web.feeds.recipes import BasicNewsRecipe
  
 class yichunxinwen(BasicNewsRecipe):
  
-    title = '宜春政府网政务要闻'
+    title = '宜春政府网宜春要闻'
     description = ''
 #   cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
     
