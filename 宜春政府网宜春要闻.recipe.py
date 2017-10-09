@@ -1,6 +1,6 @@
 from calibre.web.feeds.recipes import BasicNewsRecipe
  
-class yichunxinwen(BasicNewsRecipe):
+class yichunyaowen(BasicNewsRecipe):
  
     title = '宜春政府网宜春要闻'
     description = ''
@@ -8,9 +8,9 @@ class yichunxinwen(BasicNewsRecipe):
     
  
     url_prefix = 'http://www.yichun.gov.cn/zwgk/zwdt/zwyw/'
-    no_stylesheets = False
+    no_stylesheets = True
     keep_only_tags = [{ 'class': 'Custom_UnionStyle' }]
-    delay = 1
+#    delay = 1
     simultaneous_downloads = 5
     remove_javascript = True
     timefmt = '[%Y年 %b %d日 星期%a]' #在首页所显示的日期格式，缺省格式为日，月，年：timefmt = '[%a, %d %b %Y]'
@@ -30,15 +30,14 @@ class yichunxinwen(BasicNewsRecipe):
         for link in table.findAll('a'):
 
             
-            link['href']=link['href'].lstrip('\./')
+#            link['href']=link['href'].lstrip('\./')
             til = self.get_title(link)
             url = self.url_prefix + link['href']
             a = { 'title': til, 'url': url }
  
             articles.append(a)
  
-        ans = [('yichunxinwen', articles)]
+        ans = [('宜春政府网宜春要闻', articles)]
  
         return ans
-
 
