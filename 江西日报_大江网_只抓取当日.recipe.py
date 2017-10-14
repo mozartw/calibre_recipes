@@ -56,16 +56,17 @@ class jiangxidaily(BasicNewsRecipe):
             
             artical_link = []
 
-            for td in table.findAll('td',"p14"):
+            for td in table.findAll('td',"p14"): #td,p14两个条件找出来的标签包含了链接块中的日期
 
-                find_today = re.compile('(\d\d)-(\d\d)</td>')
-                month = find_today.search(str(td))
-                if not month.group(2) == self.datetime[2]:
+                find_today = re.compile('(\d\d)-(\d\d)</td>')#构建找到末尾发布日期的正则表达式
+                month = find_today.search(str(td))#把上面构建的表达式作用于findAll找出来的内容
+                if not month.group(2) == self.datetime[2]:  #判断日期是否为当日
                     continue
-                if not month.group(1) == self.datetime[1]:
+                if not month.group(1) == self.datetime[1]:  #判断月份是否为当日
                     continue
-                artical_link.append(str(td))
+                artical_link.append(str(td)) #注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
         
+
             soup2 = self.index_to_soup(''.join(artical_link))
             
 
