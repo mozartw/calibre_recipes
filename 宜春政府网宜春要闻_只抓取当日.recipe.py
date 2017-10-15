@@ -1,4 +1,6 @@
 from calibre.web.feeds.recipes import BasicNewsRecipe
+#导入日期时间模块和正则表达式，用于判定链接是否为当日
+import datetime,re
 
 class yichunyaowen(BasicNewsRecipe):
 
@@ -17,10 +19,12 @@ class yichunyaowen(BasicNewsRecipe):
     __author__ = 'suchao.personal@gmail.com' # 这个订阅列表的作者
 #   oldest_article = 1  #下载的最旧的文章是几天前的。默认是7天，单位是天。如果文章有日期，这个参数起作用。但是这个日期暂时不知道怎么认定，这个参数在宜春政府网的政务要闻不起作用
 
+    datetime = str(datetime.date.today()).split('-')  #对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表
 
     def get_title(self, link):
         return link.contents[0].strip()
 
+    #下面的函数为recipe必要函数，返回的内容直接用于生成电子书
     def parse_index(self):
         soup = self.index_to_soup(self.url_prefix)
         table = soup.find('table', { 'style' : 'margin-top:5px;' })
