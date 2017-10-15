@@ -64,7 +64,7 @@ class jiangxidaily(BasicNewsRecipe):
                     d1 = datetime.date.today()  # 获取今天的日期
                     d2 = datetime.date(int(self.datetime_t[0]), int(month.group(1)), int(month.group(2)))  # 获取新闻的日期
                     days_betwen = (d1 - d2).days #获取时间差，结果为整数
-                    if days_betwen <= 1 : #限定抓取几天内的新闻，当天的则为days_betwen == 5
+                    if days_betwen <= 1 : #限定抓取几天内的新闻，当天的则为days_betwen == 0
                         artical_link.append(str(td))  # 注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
                 except:
                     pass
