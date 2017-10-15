@@ -28,7 +28,7 @@ class jiangxidaily(BasicNewsRecipe):
     __author__ = 'suchao.personal@gmail.com'
 
 
-    datetime = str(datetime.date.today()).split('-')  #对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表
+    datetime_t = str(datetime.date.today()).split('-')  #对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表
 
     #下面的函数为recipe必要函数，返回的内容直接用于生成电子书
     def parse_index(self):
@@ -54,18 +54,20 @@ class jiangxidaily(BasicNewsRecipe):
 
             #以下for循环用于判定链接日期是否为当日，并把符合当日条件的标签块提取到artical_link列表
 
-            artical_link = []#用正则表达式找出包含当日新闻的框架形成一个列表，会有一些多余的标签，所以下面继续用for循环去除多余标签
+            artical_link = []
 
             for td in table.findAll('td',"p14"): #td,p14两个条件找出来的标签包含了链接块中的日期
 
                 find_today = re.compile('(\d\d)-(\d\d)</td>')#构建找到末尾发布日期的正则表达式
                 month = find_today.search(str(td))#把上面构建的表达式作用于findAll找出来的内容
-                if not month.group(2) == self.datetime[2]:  #判断日期是否为当日，如果要日期的话(比如10号)，则改为字符串month.group(2) == '10'，下同
-                    continue
-                if not month.group(1) == self.datetime[1]:  #判断月份是否为当日
-                    continue
-                artical_link.append(str(td)) #注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
-
+                try:
+                    d1 = datetime.date.today()  # 获取今天的日期
+                    d2 = datetime.date(int(self.datetime_t[0]), int(month.group(1)), int(month.group(2)))  # 获取新闻的日期
+                    days_betwen = (d1 - d2).days #获取时间差，结果为整数
+                    if days_betwen <= 1 : #限定抓取几天内的新闻，当天的则为days_betwen == 5
+                        artical_link.append(str(td))  # 注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
+                except:
+                    pass
 
             soup2 = self.index_to_soup(''.join(artical_link))
 
