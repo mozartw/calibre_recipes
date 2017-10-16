@@ -60,6 +60,7 @@ class jiangxidaily(BasicNewsRecipe):
 
                 find_today = re.compile('(\d\d)-(\d\d)</td>')#构建找到末尾发布日期的正则表达式
                 month = find_today.search(str(td))#把上面构建的表达式作用于findAll找出来的内容
+                #try/except结构主要是用于正则表达式查找，如果不用这个结构，在部分标签当中查找不到内容的时候，下面引用查找结果group()就会报错，造成崩溃。
                 try:
                     d1 = datetime.date.today()  # 获取今天的日期
                     d2 = datetime.date(int(self.datetime_t[0]), int(month.group(1)), int(month.group(2)))  # 获取新闻的日期
