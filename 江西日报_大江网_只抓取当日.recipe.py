@@ -54,7 +54,7 @@ class jiangxidaily(BasicNewsRecipe):
 
             #以下for循环用于判定链接日期是否为当日，并把符合当日条件的标签块提取到artical_link列表
 
-            artical_link = []
+            article_link = []
 
             for td in table.findAll('td',"p14"): #td,p14两个条件找出来的标签包含了链接块中的日期
 
@@ -65,11 +65,11 @@ class jiangxidaily(BasicNewsRecipe):
                     d2 = datetime.date(int(self.datetime_t[0]), int(month.group(1)), int(month.group(2)))  # 获取新闻的日期
                     days_betwen = (d1 - d2).days #获取时间差，结果为整数
                     if days_betwen <= 1 : #限定抓取几天内的新闻，当天的则为days_betwen == 0
-                        artical_link.append(str(td))  # 注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
+                        article_link.append(str(td))  # 注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
                 except:
                     pass
 
-            soup2 = self.index_to_soup(''.join(artical_link))
+            soup2 = self.index_to_soup(''.join(article_link))
 
 
             for link in soup2.findAll('a'):
