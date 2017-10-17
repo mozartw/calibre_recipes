@@ -1,5 +1,5 @@
 from calibre.web.feeds.recipes import BasicNewsRecipe
-import datetime #导入日期时间模块，各版面的url根据发行日期改变。
+import datetime,re #导入日期时间模块，各版面的url根据发行日期改变。
 
 
 class renmindaily(BasicNewsRecipe):
@@ -28,8 +28,12 @@ class renmindaily(BasicNewsRecipe):
 
     no_stylesheets = True #不采用页面样式表
     keep_only_tags = [{ 'class': 'text_c' }] #保留的正文部分
-    #移除上下多余元素，典型的web1.0产物
-    #remove_tags = [dict(name='td', attrs={'class':'px12'}),dict(name='table', attrs={'style':r'BORDER-BOTTOM: #555 1px dashed; BORDER-LEFT: #555 1px dashed; BORDER-RIGHT: #555 1px dashed; BORDER-TOP: #555 1px dashed'}),dict(name='tr', attrs={'nowrap':''}),dict(name='td', attrs={'width':'26%'})]
+    """
+    从这发现extra_css可以定义多个标签，用空格隔开即可，不可以加逗号，其实就是css的标准，只不过转化为字符串。
+    而且这里的标签指定的是原网页中的标签，而不是抓出来的书里存在的标签。
+    以人民日报为例，抓出来的书并没有h1，h2的标题标签，全换成了p，只在原来的网页中有h1,h2等。
+    """
+    extra_css = 'h1 { font-size: xx-large;}  h2 { font-size: large;}' #抓出来的文章标题太大，把字体改小一点，在人民日报网页中标题是h1标签
     #delay = 1
     #10线程下载
     simultaneous_downloads = 10
@@ -43,9 +47,21 @@ class renmindaily(BasicNewsRecipe):
     __author__ = 'suchao.personal@gmail.com'
 
 
+    """
+    本来大部分网站生成标题一般找出正文链接的<a>（定义为link）标签后，就可以通过link.contents[0].strip()来获得正文标题
+    但是人民日报<a>标签形式是“<a href="nw.D110000renmrb_20171016_2-01.htm"><script>document.write(view("中共中央召开党外人士座谈会<br>征求对中共十九大报告的意见  "))</script></a>”这种多了script脚本等多余内容的形式
+    本来在pycharm测试当中可以用“link2.contents[0].contents[0].lstrip(r'document.write(view("').rstrip(r'"))').strip().replace('<br>', ' ')”也可以取得简洁的标题
+    但是在calibre当中总是报错，或者总在运行当中，但无法抓取任何内容，也不提示超时，原因不明
+    万般无奈，只能把link（在这里定义为link2）转换为str字符串，然后用正则表达式对冗余内容进行替换（现在想起来有些复杂了，完全用replace()就行，不过写完了就算了吧）
+    经验：这里定义的link为beautisoup返回的特殊对象，在calibre当中有特别的识别方法，有一些特别的而要求。如果用str()转换为字符串后则没有特别要求。事实上我用return任意一个‘字符串’都能运行，只不过抓取的文章标题全部是'字符串'
+    """
     def get_title(self, link2):
-        return 'fuck'
-        #return link2.contents[0].contents[0].lstrip(r'document.write(view("').rstrip(r'"))').strip().replace('<br>', ' ')
+        lchange = re.compile(r'<a.*\("') # 构建左侧查找冗余内容的正则表达式，注意对括号进行转义
+        rchange = re.compile(r'"\).*</a>') # 构建右侧查找冗余内容的正则表达式，注意对括号进行转义
+        lre = lchange.sub('',str(link2)) # 替换左侧内容
+        rre = rchange.sub('',lre) # 替换右侧内容
+        return rre.strip().replace('<br>', ' ') #返回最终结果并进一步优化，在recipe的最后给文章标题提供值
+
 
     #下面的函数为recipe必要函数，返回的内容直接用于生成电子书
     def parse_index(self):
