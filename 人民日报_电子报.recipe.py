@@ -82,12 +82,20 @@ class renmindaily(BasicNewsRecipe):
 
 
             for link2 in div.findAll('a'):
-                #contens[]是BeautifulSoup的一个属性，我理解为用于去除标签，两层标签就来两次contents[0]，详见https://www.crummy.com/software/BeautifulSoup/bs4/doc.zh/。strip() 是通用字符串方法，不加参数则用于去除头尾空格
-                til = self.get_title(link2)
-                url = self.url_prefix_add + link2['href']
-                a = { 'title':til , 'url': url }
+            """
+            人民日报电子报有的版面带视频新闻，会在正文链接前放一个摄像机图标的链接，造成正文重复，而且会有img标签存在正文标题中
+            初步考虑下用正则表达式查找图片标签所必须的src=字符串，只在没有找到的时候才继续执行下面的代码
+            本来calibre当中有一个根据链接或者标题去除重复文章的api参数，但是默认去除后一个重复元素，不能选择前一个。人民日报的图片链接在正文标题前，所以没用。
+            """
+                videolink = re.compile(r'src="')
+                vlinkfind = videolink.findall(str(link2))
 
-                articles.append(a)
+                if not vlinkfind:
+                    til = self.get_title(link2)
+                    url = self.url_prefix_add + link2['href']
+                    a = { 'title':til , 'url': url }
+
+                    articles.append(a)
 
         ans = [('人民日报', articles)]
 
