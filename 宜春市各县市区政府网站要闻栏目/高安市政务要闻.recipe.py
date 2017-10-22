@@ -13,7 +13,7 @@ class gaoanredian(BasicNewsRecipe):
     url_prefix2 = 'http://www.gaxww.com/tt/index.shtml' # 头条新闻栏目_更新较少
     no_stylesheets = True
     extra_css = 'h1 { font-size: xx-large;}  h2 { font-size: large;}' #抓出来的文章标题太大，把字体改小一点
-    ignore_duplicate_articles = {'url'} #正文链接中还有一个阅读原文，与标题链接重复，用这个参数可以去除
+    #ignore_duplicate_articles = {'url'} #正文链接中还有一个阅读原文，与标题链接重复，用这个参数可以去除
     keep_only_tags = [{ 'class': 'con_wz' }]
     #remove_tags = [dict(name='td', attrs={'height':'10'}),dict(name='table', attrs={'width':'92%'})] #移除正文多余元素
 #    delay = 1
@@ -111,6 +111,9 @@ class gaoanredian(BasicNewsRecipe):
             soup2 = self.index_to_soup(''.join(arti))
 
             for link in soup2.findAll('a'):
+
+                if '查阅全文' in link.contents[0].strip(): #也可以用calibre自带的ignore_duplicate_articles = {'url'}来去除重复，但是还是会进行抓取，只是在生成书籍的时候抛弃，造成增加时间。
+                    continue
 
                 til = self.get_title(link)
                 url = link['href']
