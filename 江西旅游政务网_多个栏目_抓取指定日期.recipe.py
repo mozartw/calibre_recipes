@@ -13,6 +13,7 @@ class jiangxilvyou(BasicNewsRecipe):
     #定义一个通用的url地址。其他recipe中写的，这里懒得用了，下面直接用字符串
     #url_prefix = 'http://www.jxta.gov.cn/Column.shtml?p5='
     no_stylesheets = True
+    max_articles_per_feed  = 999 #最大文章数，默认为100
     keep_only_tags = [{ 'id': 'container' }]
     #delay = 1
     simultaneous_downloads = 10
@@ -41,10 +42,14 @@ class jiangxilvyou(BasicNewsRecipe):
 
     #下面的函数为recipe必要函数，返回的内容直接用于生成电子书
     def parse_index(self):
+
         urlist = []
-        #下面的for循环用于拼接三个栏目的url
-        for nu in range(26,29):
-            urlist.append('http://www.jxta.gov.cn/Column.shtml?p5='+str(nu))
+        for nu in range(26,29): #生成三个版面url并添加到urlist列表
+            u = 'http://www.jxta.gov.cn/Column.shtml?p5='+str(nu)
+            urlist.append(u)
+            for n in range(2,10): #生成三个版面翻页后的页面url并添加到urlist。比如第2页形式为“http://www.jxta.gov.cn/Column.shtml?p5=26&p7=2”。根据抓取日期范围调整range范围
+                urlist.append(u + '&p7=' + str(n))
+
         #这个articles列表必须放在这个位置，放下下面的for循环里面会造成最终结果缺少东西，试了很多次的结果，原因待分析
         articles = []
         #下面的for循环用于给soup.find提供多个参数，找出包含正文链接的网页框架
@@ -64,7 +69,7 @@ class jiangxilvyou(BasicNewsRecipe):
                     d1 = datetime.date.today()  # 获取今天的日期
                     d2 = datetime.date(int(self.datetime_t[0]), int(month.group(1)), int(month.group(2)))  # 获取新闻的日期
                     days_betwen = (d1 - d2).days #获取时间差，结果为整数
-                    if days_betwen <= 2 : #限定抓取几天内的新闻，当天的则为days_betwen == 0
+                    if days_betwen <= 30 : #限定抓取几天内的新闻，当天的则为days_betwen == 0
                         article_link.append(str(tr))  # 注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
                 except:
                     pass
