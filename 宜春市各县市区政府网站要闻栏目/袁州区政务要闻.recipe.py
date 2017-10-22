@@ -29,19 +29,19 @@ class yuanzhouyaowen(BasicNewsRecipe):
 
     #下面的函数为recipe必要函数，返回的内容直接用于生成电子书
     def parse_index(self):
-        urlist = []
+        urlist = [self.url_prefix]
         """
         下面的for循环用于拼接多个页面的url，并添加到urlist
         翻页后的链接形式为“http://www.yzq.gov.cn/zwgk/zwdt/zwyw/index_1.html”
-        县级政府网站更新较慢，一个月抓一次的话翻上个3到4页绰绰有余了。翻多了影响抓取效率
+        政府网站更新较慢，需根据抓取日期范围决定range范围，翻页少了缺内容，翻多了影响抓取效率
         """
-        for nu in range(1,4):
+        for nu in range(1,5):
             urlist.append(self.url_prefix + 'index_' + str(nu) + r'.html')
 
         #重要！！！这个articles列表必须放在这个位置，放下下面的for循环里面会造成最终结果缺少东西，试了很多次的结果，原因待分析
         articles = []
         for ur in urlist:
-            soup = self.index_to_soup(self.url_prefix)
+            soup = self.index_to_soup(ur)
             table = soup.find('table', {'width': '97%'})
 
             arti = []#用正则表达式找出包含当日新闻的框架形成一个列表，会有一些多余的标签，所以下面继续用for循环去除多余标签
