@@ -32,7 +32,7 @@ class yuanzhouyaowen(BasicNewsRecipe):
         urlist = [self.url_prefix]
         """
         下面的for循环用于拼接多个页面的url，并添加到urlist
-        翻页后的链接形式为“http://www.yzq.gov.cn/zwgk/zwdt/zwyw/index_1.html”
+        翻页后第2页的链接形式为“http://www.yzq.gov.cn/zwgk/zwdt/zwyw/index_1.html”
         政府网站更新较慢，需根据抓取日期范围决定range范围，翻页少了缺内容，翻多了影响抓取效率
         """
         for nu in range(1,5):
