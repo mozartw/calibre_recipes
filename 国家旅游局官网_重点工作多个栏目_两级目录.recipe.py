@@ -86,7 +86,9 @@ class chinata(BasicNewsRecipe):
             for link in soup3.findAll('a'):
 
                 til = self.get_title(link)
-                url = vol_ul + link['href'].lstrip('\./')
+                url = vol_ul + link['href']
+                #calibre能够识别相对路径，以后相对路径一律不用修改特别是“厕所革命”栏目用的i是../../这种网上跳级的模式，更不能变动
+                #url = vol_ul + link['href'].lstrip('\./')
                 a = { 'title':til , 'url': url }
 
                 articles.append(a)
