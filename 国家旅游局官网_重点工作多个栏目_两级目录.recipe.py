@@ -65,6 +65,8 @@ class chinata(BasicNewsRecipe):
                 try:
                     soup2 = self.index_to_soup(ur)
                 except:
+                    #要准确把握这个try/excpet结构放置位置，excpt之后执行break是比较好的选择，因为如果A页面访问不了的话，那么A页面后面的页面一般也访问不了，所以较之continue和pass能够提高运行效率。
+                    #特别重要！！break中断for循环之后不能影响后面的代码块运行，应该在中断后为后面的语句块提供一个空元素，这里是一个空的article_link列表
                     break
 
                 for li in soup2.findAll('li'):

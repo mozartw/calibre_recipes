@@ -40,24 +40,31 @@ class yichunyaowen(BasicNewsRecipe):
 
         #重要！！！这个articles列表必须放在这个位置
         articles = []
+
+        arti = []#用正则表达式找出包含当日新闻的框架形成一个列表，会有一些多余的标签，所以下面继续用for循环去除多余标签
         for ur in urlist:
-            soup = self.index_to_soup(ur)
-            table = soup.find('table', { 'style' : 'margin-top:5px;' })
+            #重要！！！下面的try/except结构是为了防止上面指定的翻页数过多，最终溢出原网页拥有的页面，导致calibre报错并中断抓取进程。所有指定翻页的网页必须添加这个语句。以备不测。
+            try:
+                soup = self.index_to_soup(ur)
+                table = soup.find('table', { 'style' : 'margin-top:5px;' })
 
-            arti = []#用正则表达式找出包含当日新闻的框架形成一个列表，会有一些多余的标签，所以下面继续用for循环去除多余标签
-            for tr in table.findAll('tr'):
+                for tr in table.findAll('tr'):
 
-                find_today = re.compile(r'(\d\d)-(\d\d)</td>')  # 构建找到末尾发布日期的正则表达式
-                month = find_today.search(str(tr))  # 把上面构建的表达式作用于findAll找出来的内容
+                    find_today = re.compile(r'(\d\d)-(\d\d)</td>')  # 构建找到末尾发布日期的正则表达式
+                    month = find_today.search(str(tr))  # 把上面构建的表达式作用于findAll找出来的内容
 
-                try:
-                    d1 = datetime.date.today()  # 获取今天的日期
-                    d2 = datetime.date(int(self.datetime_t[0]), int(month.group(1)), int(month.group(2)))  # 获取新闻的日期
-                    days_betwen = (d1 - d2).days #获取时间差，结果为整数
-                    if days_betwen <= 30 : #限定抓取几天内的新闻，当天的则为days_betwen == 0
-                        arti.append(str(tr))  # 注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
-                except:
-                    pass
+                    try:
+                        d1 = datetime.date.today()  # 获取今天的日期
+                        d2 = datetime.date(int(self.datetime_t[0]), int(month.group(1)), int(month.group(2)))  # 获取新闻的日期
+                        days_betwen = (d1 - d2).days #获取时间差，结果为整数
+                        if days_betwen <= 30 : #限定抓取几天内的新闻，当天的则为days_betwen == 0
+                            arti.append(str(tr))  # 注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
+                    except:
+                        pass
+            except:
+                break
+
+
 
 
             soup2 = self.index_to_soup(''.join(arti))
