@@ -16,7 +16,7 @@ class cnrfi(BasicNewsRecipe):
     max_articles_per_feed  = 999 #最大文章数，默认为100
     #压缩图片
     compress_news_images= True
-    #在首页所显示的日期格式，缺省格式为日，月，年：timefmt = '[%a, %d %b %Y]'
+    #在首页所显示的日期格式，缺省格式为日，月，年：timefmt = '[%a, %d %b %Y]'，windows平台上此项不能包含中文字符，否则生成不了有日期的封面。linux下可以
     timefmt = '[%Y %b %d %a]'
     # 声明这个订阅列表的作者
     __author__ = 'suchao.personal@gmail.com'
@@ -33,7 +33,7 @@ class cnrfi(BasicNewsRecipe):
 			articles = []
 			url_list = []
 			vol_tl = lan + '时事'
-			for nu in range(1,3):
+			for nu in range(1,3): #翻页后的url，以中国板块为例，两个页面一般就包含了4天左右的新闻
 				vol_ul = 'http://cn.rfi.fr/' + liebie_dic[lan] + '/all/?page=' + str(nu)
 				url_list.append(vol_ul)
 
