@@ -33,7 +33,7 @@ class cnrfi(BasicNewsRecipe):
 			articles = []
 			url_list = []
 			vol_tl = lan + '时事'
-			for nu in range(1,3):
+			for nu in range(1,3): #翻页后的url，以中国板块为例，两个页面一般就包含了4天左右的新闻
 				vol_ul = 'http://cn.rfi.fr/' + liebie_dic[lan] + '/all/?page=' + str(nu)
 				url_list.append(vol_ul)
 
