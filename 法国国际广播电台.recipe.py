@@ -2,7 +2,7 @@ from calibre.web.feeds.recipes import BasicNewsRecipe
 import datetime,re #导入日期时间模块，各版面的url根据发行日期改变。
 
 
-class renmindaily(BasicNewsRecipe):
+class cnrfi(BasicNewsRecipe):
 
     title = '法国国际广播电台'
     description = '抓取法国国际广播电台中文网各栏目新闻'
@@ -20,14 +20,14 @@ class renmindaily(BasicNewsRecipe):
     timefmt = '[%Y %b %d %a]'
     # 声明这个订阅列表的作者
     __author__ = 'suchao.personal@gmail.com'
-    
+
     url_prefix = 'http://cn.rfi.fr'
 
     #下面的函数为recipe必要函数，返回的内容直接用于生成电子书
     def parse_index(self):
 		liebie_dic = {'中国':'%E4%B8%AD%E5%9B%BD','港澳台':'%E6%B8%AF%E6%BE%B3%E5%8F%B0', '国际':'%E5%9B%BD%E9%99%85', '人权':'%E4%BA%BA%E6%9D%83', '政治':'%E6%94%BF%E6%B2%BB', '经贸':'%E7%BB%8F%E8%B4%B8', '社会':'%E7%A4%BE%E4%BC%9A', '生态':'%E7%94%9F%E6%80%81', '科技与文化':'%E7%A7%91%E6%8A%80%E4%B8%8E%E6%96%87%E5%8C%96'} # 栏目及对应的url编码
-		liebie_list = ['中国','港澳台','国际','人权','政治','经贸','社会','生态','科技与文化'] #在上面的字典范围内设置需要抓取的栏目
-		
+		liebie_list = ['中国','港澳台','国际','人权','政治','经贸','社会','生态','科技与文化'] #在上面的字典范围内设置需要抓取的栏目，可增可减
+
 		ans0 = []
 		for lan in liebie_list:
 			articles = []
@@ -36,7 +36,7 @@ class renmindaily(BasicNewsRecipe):
 			for nu in range(1,3):
 				vol_ul = 'http://cn.rfi.fr/' + liebie_dic[lan] + '/all/?page=' + str(nu)
 				url_list.append(vol_ul)
-			
+
 			for ul in url_list:
 				soup = self.index_to_soup(ul)
 				artiultag = soup.find('ul', attrs = {'class':'list'})
@@ -74,5 +74,5 @@ class renmindaily(BasicNewsRecipe):
 			ans = (vol_tl, articles)
 
 			ans0.append(ans)
-				
+
 		return ans0
