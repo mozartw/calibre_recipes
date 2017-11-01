@@ -17,7 +17,8 @@ class yichunyaowen(BasicNewsRecipe):
     simultaneous_downloads = 5
     remove_javascript = True
     max_articles_per_feed  = 999 #最大文章数，默认为100
-    timefmt = '[%Y年 %b %d日 星期%a]' #在首页所显示的日期格式，缺省格式为日，月，年：timefmt = '[%a, %d %b %Y]'
+    #在首页所显示的日期格式，缺省格式为日，月，年：timefmt = '[%a, %d %b %Y]'，windows平台上此项不能包含中文字符，否则生成不了有日期的封面。linux下可以
+    timefmt = '[%Y %b %d %a]'
     __author__ = 'suchao.personal@gmail.com' # 这个订阅列表的作者
 #   oldest_article = 1  #下载的最旧的文章是几天前的。默认是7天，单位是天。如果文章有日期，这个参数起作用。但是这个日期暂时不知道怎么认定，这个参数在宜春政府网的政务要闻不起作用
 

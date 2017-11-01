@@ -24,8 +24,8 @@ class jiangxilvyou(BasicNewsRecipe):
     compress_news_images= True
     #抓取出来的页面文章段落会居中，非常难看，即使在本句当中指定p元素的对齐方式也还是有部分文章依然居中，只能眉毛胡子一把抓，全部分散对齐算了这样做的结果是文章标题也没法居中了
     extra_css = 'p,table,td,tr,div { text-align: justify;}'
-    #在首页所显示的日期格式，缺省格式为日，月，年：timefmt = '[%a, %d %b %Y]'
-    timefmt = '[%Y年 %b %d日 星期%a]'
+    #在首页所显示的日期格式，缺省格式为日，月，年：timefmt = '[%a, %d %b %Y]'，windows平台上此项不能包含中文字符，否则生成不了有日期的封面。linux下可以
+    timefmt = '[%Y %b %d %a]'
     # 声明这个订阅列表的作者
     __author__ = 'suchao.personal@gmail.com'
 
