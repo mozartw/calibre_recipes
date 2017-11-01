@@ -22,8 +22,8 @@ class cnnytimes(BasicNewsRecipe):
 	__author__ = 'suchao.personal@gmail.com'
 
 	url_prefix = 'https://cn.nytimes.com'
-    
-    
+	
+	#下面这个函数用于预处理下载下来的正文，移除中文中的超链接。
 	def postprocess_html(self, soup, first_fetch):
 		for a in soup.findAll('a', href=True):
 			del a['href']
