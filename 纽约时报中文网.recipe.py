@@ -8,8 +8,8 @@ class cnnytimes(BasicNewsRecipe):
 	description = '抓取纽约时报中文网各栏目新闻'
 	no_stylesheets = True #不采用页面样式表
 	keep_only_tags = [{ 'class': 'cf layoutAB' }] #保留的正文部分
-	remove_tags = [dict(name='div', attrs={'class':'articleByside'}),dict(name='div', attrs={'class':'actions'}),dict(name='div', attrs={'class':'meta'})] #移除上下多余元素
-	extra_css = 'h1 { font-size: xx-large;}  h2 { font-size: large;}' #抓出来的文章标题太大，把字体改小一点
+	remove_tags = [dict(name='div', attrs={'class':'articleByside'}),dict(name='div', attrs={'class':'cf articleTool'}),dict(name='div', attrs={'class':'authorIdentification'}),dict(name='div', attrs={'class':'cf no-content'}),dict(name='div', attrs={'class':'photoWrapper '})] #移除上下多余元素
+	#extra_css = 'h1 { font-size: xx-large;}  h2 { font-size: large;}' 
 	#delay = 1 #网页访问较慢（fuck！！），设置1秒延时
 
 	remove_javascript = True
@@ -22,7 +22,13 @@ class cnnytimes(BasicNewsRecipe):
 	__author__ = 'suchao.personal@gmail.com'
 
 	url_prefix = 'https://cn.nytimes.com'
-
+    
+    
+	def postprocess_html(self, soup, first_fetch):
+		for a in soup.findAll('a', href=True):
+			del a['href']
+		return soup
+    
 	#下面的函数为recipe必要函数，返回的内容直接用于生成电子书
 	def parse_index(self):
 		liebie_dic = liebie_dic = {'世界': 'world', '中国': 'china', '商业': 'business'} # 栏目及对应的url字符
@@ -52,7 +58,7 @@ class cnnytimes(BasicNewsRecipe):
 						d1 = datetime.date.today()  # 获取今天的日期
 						d2 = datetime.date(int(month.group(1)), int(month.group(2)), int(month.group(3)))  # 获取新闻的日期
 						days_betwen = (d1 - d2).days  # 获取时间差，结果为整数
-						if days_betwen <= 10:  # 限定抓取几天内的新闻，当天的则为days_betwen == 0
+						if days_betwen <= 3:  # 限定抓取几天内的新闻，当天的则为days_betwen == 0
 							article_link.append(str(li))  # 注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
 					except:
 						pass
