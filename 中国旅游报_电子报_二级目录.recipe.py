@@ -10,7 +10,7 @@ class zhongguolvyoubao(BasicNewsRecipe):
     #cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
 
     #中国旅游报更新较慢，如果要获取昨天的日期，下面可写为str(datetime.date.today()-datetime.timedelta(days=1)).split('-')。如果是前天就改动days=2，以此类推
-    datetime = str(datetime.date.today()).split('-')  #对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表
+    datetime = str(datetime.date.today()).split('-')  # 用str(datetime.date.today()).split('-')对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表
 
     #以下用于抓取当日报纸
     url_prefix = 'http://news.ctnews.com.cn/zglyb/html/' #url前缀

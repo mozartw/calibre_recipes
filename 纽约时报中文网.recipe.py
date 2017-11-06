@@ -9,7 +9,7 @@ class cnnytimes(BasicNewsRecipe):
 	no_stylesheets = True #不采用页面样式表
 	keep_only_tags = [{ 'class': 'cf layoutAB' }] #保留的正文部分
 	remove_tags = [dict(name='div', attrs={'class':'articleByside'}),dict(name='div', attrs={'class':'cf articleTool'}),dict(name='div', attrs={'class':'authorIdentification'}),dict(name='div', attrs={'class':'cf no-content'}),dict(name='div', attrs={'class':'photoWrapper '})] #移除上下多余元素
-	#extra_css = 'h1 { font-size: xx-large;}  h2 { font-size: large;}' 
+	#extra_css = 'h1 { font-size: xx-large;}  h2 { font-size: large;}'
 	#delay = 1 #网页访问较慢（fuck！！），设置1秒延时
 
 	remove_javascript = True
@@ -22,13 +22,13 @@ class cnnytimes(BasicNewsRecipe):
 	__author__ = 'suchao.personal@gmail.com'
 
 	url_prefix = 'https://cn.nytimes.com'
-	
-	#下面这个函数用于预处理下载下来的正文，移除中文中的超链接。
+
+	#下面这个函数用于预处理下载下来的正文，移除文中的超链接。
 	def postprocess_html(self, soup, first_fetch):
 		for a in soup.findAll('a', href=True):
 			del a['href']
 		return soup
-    
+
 	#下面的函数为recipe必要函数，返回的内容直接用于生成电子书
 	def parse_index(self):
 		liebie_dic = liebie_dic = {'世界': 'world', '中国': 'china', '商业': 'business'} # 栏目及对应的url字符
