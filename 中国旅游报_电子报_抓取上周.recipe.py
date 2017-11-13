@@ -5,7 +5,7 @@ import datetime #导入日期时间模块，各版面的url根据发行日期改
 class zhongguolvyoubao_week(BasicNewsRecipe):
 
     title = '中国旅游报_抓取上周'
-    description = '抓取指定参照日期前一周的中国旅游报各版面新闻。***参照日期指定的具体办法见recipe当中的from_day变量'
+    description = '抓取指定参照日期前一周的中国旅游报各版面新闻。***参照日期指定的具体办法见recipe当中的from_day变量，默认以当日为参照日，抓取上周'
     #通过url抓取封面
     #cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
 
