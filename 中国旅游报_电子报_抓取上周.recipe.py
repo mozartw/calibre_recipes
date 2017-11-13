@@ -2,10 +2,10 @@ from calibre.web.feeds.recipes import BasicNewsRecipe
 import datetime #导入日期时间模块，各版面的url根据发行日期改变。
 
 
-class zhongguolvyoubao(BasicNewsRecipe):
+class zhongguolvyoubao_week(BasicNewsRecipe):
 
-    title = '中国旅游报'
-    description = '抓取上周中国旅游报各版面新闻'
+    title = '中国旅游报_抓取上周'
+    description = '抓取指定参照日期前一周的中国旅游报各版面新闻。***参照日期指定的具体办法见recipe当中的from_day变量'
     #通过url抓取封面
     #cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
 
@@ -31,16 +31,20 @@ class zhongguolvyoubao(BasicNewsRecipe):
 
     #下面的函数为recipe必要函数，返回的内容直接用于生成电子书
     def parse_index(self):
+        # from_day为参照基准日。
+        # 如果是从当前日期开始，抓取上一周的报纸则：from_day = datetime.date.today()
+        # 如果指定上周一个日期为参照基准日，抓取上上周的报纸则：datetime.date.today()-datetime.timedelta(days= 7)，即基准日从今天往前推7天
+        # 如果指定上上周一个日期为参照基准日，抓取上上上周报纸则：datetime.date.today()-datetime.timedelta(days= 2*7)，即基准日从今天往前推2个7天。以此类推
+        from_day = datetime.date.today()
 
-        today = datetime.date.today()  # 获取当前日期, 因为要求时分秒为0, 所以不要求时间
-        weekday = today.weekday()  # 获取当前周的排序, 周一为0, 周日为6
+        weekday = from_day.weekday()  # 获取指定日期的周的排序, 周一为0, 周日为6
         # 旅游报周一到周五发行，以下算出日期区间
         last_monday_delta = weekday + 7  # 当前日期距离上周一的天数差
-        last_friday_delta = weekday + 3  # 当前日期距离上周五的时间差
+        last_friday_delta = weekday + 3  # 当前日期距离上周五的天数差
 
         ans0 = []
         for nu in range(last_friday_delta,last_monday_delta + 1): # for循环用于枚举上一个礼拜周一到周五的日期
-            riqi = datetime.date.today() - datetime.timedelta(days = nu)
+            riqi = from_day - datetime.timedelta(days = nu)
             datetime_t = str(riqi).split('-')  #对日期进行拆分，返回一个['2017', '10', '09']形式的列表
             url_prefix = 'http://news.ctnews.com.cn/zglyb/html/' #url前缀
             url_prefix_add = 'http://news.ctnews.com.cn/zglyb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' #url前缀带日期
