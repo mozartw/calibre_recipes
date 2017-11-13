@@ -5,7 +5,11 @@ import datetime,re
 class yichunyaowen(BasicNewsRecipe):
 
     title = '宜春政府网宜春要闻'
+    # 以下conversion_options利用calibre自带参数覆写上面的title，让电子书标题显示为"宜春政府网宜春要闻2017-11-13"格式，可以直接看出抓取操作的日期。
+    # 也可以直接在title中直接写，但是会造成calibre的GUI recipe界面中标题显示杂乱，不太好看。
+    conversion_options = {'title': '宜春政府网宜春要闻' + str(datetime.date.today()),}
     description = ''
+    days_delta = 7 # 定义抓取区间，非calibre自带参数，在parse_index(self)中用于判断，具体见下
 #   cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
 
 
@@ -23,6 +27,29 @@ class yichunyaowen(BasicNewsRecipe):
 #   oldest_article = 1  #下载的最旧的文章是几天前的。默认是7天，单位是天。如果文章有日期，这个参数起作用。但是这个日期暂时不知道怎么认定，这个参数在宜春政府网的政务要闻不起作用
 
     datetime_t = str(datetime.date.today()).split('-')  #对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表
+
+    # 以下函数用于生成默认封面。关键的是img_data。
+    def default_cover(self, cover_file):
+        '''
+        Create a generic cover for recipes that don't have a cover
+        '''
+        #以下用于算出抓取新闻区间前后两个日期，在封面底端显示：抓取新闻日期区间\n2017-11-6至2017-11-13
+        today = datetime.date.today()
+        before = datetime.date.today()-datetime.timedelta(days = self.days_delta)
+
+        try:
+            from calibre.ebooks.covers import create_cover
+            title = self.title if isinstance(self.title, unicode) else \
+                    self.title.decode(preferred_encoding, 'replace')
+            date = '抓取新闻日期区间' + '\n' + str(before) + '至' + str(today)
+            img_data = create_cover(title, [date])
+            cover_file.write(img_data)
+            cover_file.flush()
+        except:
+            self.log.exception('Failed to generate default cover')
+            return False
+        return True
+
 
     def get_title(self, link):
         return link.contents[0].strip()
@@ -58,7 +85,7 @@ class yichunyaowen(BasicNewsRecipe):
                         d1 = datetime.date.today()  # 获取今天的日期
                         d2 = datetime.date(int(self.datetime_t[0]), int(month.group(1)), int(month.group(2)))  # 获取新闻的日期
                         days_betwen = (d1 - d2).days #获取时间差，结果为整数
-                        if days_betwen <= 30 : #限定抓取几天内的新闻，当天的则为days_betwen == 0
+                        if days_betwen <= self.days_delta : #限定抓取几天内的新闻，当天的则为days_betwen == 0
                             arti.append(str(tr))  # 注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
                     except:
                         pass
