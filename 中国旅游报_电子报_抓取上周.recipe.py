@@ -4,11 +4,11 @@ import datetime #导入日期时间模块，各版面的url根据发行日期改
 
 class zhongguolvyoubao_week(BasicNewsRecipe):
 
-    title = '中国旅游报_抓取上周'
+    # title = '中国旅游报_抓取上周'  #书籍和recipe标题，这里因为要用到下面的变量，所以移到底下了。
+
     description = '抓取指定参照日期前一周的中国旅游报各版面新闻。***参照日期指定的具体办法见recipe当中的from_day变量，默认以当日为参照日，抓取上周'
     #通过url抓取封面
     #cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
-
 
 
     no_stylesheets = True #不采用页面样式表
@@ -16,8 +16,8 @@ class zhongguolvyoubao_week(BasicNewsRecipe):
     #移除上下多余元素，典型的web1.0产物
     #remove_tags = [dict(name='td', attrs={'class':'px12'}),dict(name='table', attrs={'style':r'BORDER-BOTTOM: #555 1px dashed; BORDER-LEFT: #555 1px dashed; BORDER-RIGHT: #555 1px dashed; BORDER-TOP: #555 1px dashed'}),dict(name='tr', attrs={'nowrap':''}),dict(name='td', attrs={'width':'26%'})]
     #delay = 1
-    #10线程下载
-    simultaneous_downloads = 10
+    #5线程下载
+    simultaneous_downloads = 5
     remove_javascript = True
 
     #压缩图片
@@ -29,22 +29,49 @@ class zhongguolvyoubao_week(BasicNewsRecipe):
 
 
 
+    # from_day为参照基准日。
+    # 如果是从当前日期开始，抓取上一周的报纸则：from_day = datetime.date.today()
+    # 如果指定上周一个日期为参照基准日，抓取上上周的报纸则：datetime.date.today()-datetime.timedelta(days= 7)，即基准日从今天往前推7天
+    # 如果指定上上周一个日期为参照基准日，抓取上上上周报纸则：datetime.date.today()-datetime.timedelta(days= 2*7)，即基准日从今天往前推2个7天。以此类推
+    from_day = datetime.date.today()
+    weekday = from_day.weekday()  # 获取指定日期的周的排序, 周一为0, 周日为6
+    # 旅游报周一到周五发行，以下算出日期区间
+    last_monday_delta = weekday + 7  # 当前日期距离上周一的天数差
+    last_friday_delta = weekday + 3  # 当前日期距离上周五的天数差
+    last_monday = datetime.date.today() - datetime.timedelta(days = last_monday_delta)
+    last_friday = datetime.date.today() - datetime.timedelta(days = last_friday_delta)
+
+    week_rank = last_monday.isocalendar() # 返回结果是三元组（年号，第几周，第几天），用于写入书籍标题
+    title = '中国旅游报\n' + str(week_rank[0]) + '年第' + str(week_rank[1]) + '周'
+
+    # 以下函数用于生成默认封面。关键的是img_data。
+    def default_cover(self, cover_file):
+        '''
+        Create a generic cover for recipes that don't have a cover
+        '''
+        try:
+            from calibre.ebooks.covers import create_cover
+            # 用上面覆写的标题放在封面
+            title = title = self.title if isinstance(self.title, unicode) else \
+                    self.title.decode(preferred_encoding, 'replace')
+
+            wenzi = '书籍内容：'
+            date = str(self.last_monday) + '至' + str(self.last_friday) + '\n期间发行的中国旅游报'
+            img_data = create_cover(title, [wenzi,date]) #这个列表里面的内容全部会显示在封面上，默认只有date，可以自己加
+            cover_file.write(img_data)
+            cover_file.flush()
+        except:
+            self.log.exception('Failed to generate default cover')
+            return False
+        return True
+
+
+
     #下面的函数为recipe必要函数，返回的内容直接用于生成电子书
     def parse_index(self):
-        # from_day为参照基准日。
-        # 如果是从当前日期开始，抓取上一周的报纸则：from_day = datetime.date.today()
-        # 如果指定上周一个日期为参照基准日，抓取上上周的报纸则：datetime.date.today()-datetime.timedelta(days= 7)，即基准日从今天往前推7天
-        # 如果指定上上周一个日期为参照基准日，抓取上上上周报纸则：datetime.date.today()-datetime.timedelta(days= 2*7)，即基准日从今天往前推2个7天。以此类推
-        from_day = datetime.date.today()
-
-        weekday = from_day.weekday()  # 获取指定日期的周的排序, 周一为0, 周日为6
-        # 旅游报周一到周五发行，以下算出日期区间
-        last_monday_delta = weekday + 7  # 当前日期距离上周一的天数差
-        last_friday_delta = weekday + 3  # 当前日期距离上周五的天数差
-
         ans0 = []
-        for nu in range(last_friday_delta,last_monday_delta + 1): # for循环用于枚举上一个礼拜周一到周五的日期
-            riqi = from_day - datetime.timedelta(days = nu)
+        for nu in range(self.last_monday_delta , self.last_friday_delta - 1 , -1): # for循环用于枚举上一个礼拜周一到周五的日期 。注意：如果先抓取发行最晚的则写为self.last_friday_delta , self.last_monday_delta + 1。
+            riqi = self.from_day - datetime.timedelta(days = nu)
             datetime_t = str(riqi).split('-')  #对日期进行拆分，返回一个['2017', '10', '09']形式的列表
             url_prefix = 'http://news.ctnews.com.cn/zglyb/html/' #url前缀
             url_prefix_add = 'http://news.ctnews.com.cn/zglyb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' #url前缀带日期

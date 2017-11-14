@@ -20,8 +20,8 @@ class renmindaily_week(BasicNewsRecipe):
     """
     extra_css = 'h1 { font-size: xx-large;}  h2 { font-size: large;}' #抓出来的文章标题太大，把字体改小一点，在人民日报网页中标题是h1标签
     #delay = 1
-    #10线程下载
-    simultaneous_downloads = 10
+    #5线程下载
+    simultaneous_downloads = 5
     remove_javascript = True
     max_articles_per_feed  = 999 #最大文章数，默认为100
     #压缩图片
@@ -62,7 +62,7 @@ class renmindaily_week(BasicNewsRecipe):
         last_sunday_delta = weekday + 1  # 当前日期距离上周五的天数差
 
         ans0 = []
-        for nu in range(last_monday_delta + 1,last_sunday_delta,-1): # for循环用于枚举上一个礼拜周一到周五的日期
+        for nu in range(last_monday_delta,last_sunday_delta-1,-1): # for循环用于枚举上一个礼拜周一到周五的日期。注意：如果先抓取发行最晚的则写为self.last_sunday_delta , self.last_monday_delta + 1。
             riqi = from_day - datetime.timedelta(days = nu)
             datetime_t = str(riqi).split('-')  #对日期进行拆分，返回一个['2017', '10', '09']形式的列表
             url_prefix = 'http://paper.people.com.cn/rmrb/html/' #url前缀

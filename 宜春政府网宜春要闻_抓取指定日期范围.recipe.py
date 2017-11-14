@@ -7,7 +7,7 @@ class yichunyaowen(BasicNewsRecipe):
     title = '宜春政府网宜春要闻'
     # 以下conversion_options利用calibre自带参数覆写上面的title，让电子书标题显示为"宜春政府网宜春要闻2017-11-13"格式，可以直接看出抓取操作的日期。
     # 也可以直接在title中直接写，但是会造成calibre的GUI recipe界面中标题显示杂乱，不太好看。
-    conversion_options = {'title': '宜春政府网宜春要闻' + str(datetime.date.today()),}
+    conversion_options = {'title': '宜春政府网宜春要闻' + str(datetime.date.today())}
     description = ''
     days_delta = 7 # 定义抓取区间，非calibre自带参数，在parse_index(self)中用于判断，具体见下
 #   cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
@@ -26,7 +26,7 @@ class yichunyaowen(BasicNewsRecipe):
     __author__ = 'suchao.personal@gmail.com' # 这个订阅列表的作者
 #   oldest_article = 1  #下载的最旧的文章是几天前的。默认是7天，单位是天。如果文章有日期，这个参数起作用。但是这个日期暂时不知道怎么认定，这个参数在宜春政府网的政务要闻不起作用
 
-    datetime_t = str(datetime.date.today()).split('-')  #对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表
+    datetime_t = str(datetime.date.today()).split('-')  #对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表，如果指定一个具体的日期进行抓取的话写为str(datetime.date(2017, 10, 07)).split('-')，或者直接写一个['2017', '10', '07']列表
 
     # 以下函数用于生成默认封面。关键的是img_data。
     def default_cover(self, cover_file):
