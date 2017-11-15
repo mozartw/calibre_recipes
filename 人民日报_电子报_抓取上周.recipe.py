@@ -32,6 +32,45 @@ class renmindaily_week(BasicNewsRecipe):
     __author__ = 'suchao.personal@gmail.com'
 
 
+    # from_day为参照基准日。
+    # 如果是从当前日期开始，抓取上一周的报纸则：from_day = datetime.date.today()
+    # 如果指定上周一个日期为参照基准日，抓取上上周的报纸则：datetime.date.today()-datetime.timedelta(days= 7)，即基准日从今天往前推7天
+    # 如果指定上上周一个日期为参照基准日，抓取上上上周报纸则：datetime.date.today()-datetime.timedelta(days= 2*7)，即基准日从今天往前推2个7天。以此类推
+    from_day = datetime.date.today()
+
+    weekday = from_day.weekday()  # 获取指定日期的周的排序, 周一为0, 周日为6
+    # 旅游报周一到周五发行，以下算出日期区间
+    last_monday_delta = weekday + 7  # 当前日期距离上周一的天数差
+    last_sunday_delta = weekday + 1  # 当前日期距离上周五的天数差
+    last_monday = datetime.date.today() - datetime.timedelta(days = last_monday_delta)
+    last_sunday = datetime.date.today() - datetime.timedelta(days = last_sunday_delta)
+
+    week_rank = last_monday.isocalendar() # 返回结果是三元组（年号，第几周，第几天），用于写入书籍标题
+    title = '人民日报\n' + str(week_rank[0]) + '年第' + str(week_rank[1]) + '周'
+
+    # 以下函数用于生成默认封面。关键的是img_data。
+    def default_cover(self, cover_file):
+        '''
+        Create a generic cover for recipes that don't have a cover
+        '''
+        try:
+            from calibre.ebooks.covers import create_cover
+            # 用上面覆写的标题放在封面
+            title = title = self.title if isinstance(self.title, unicode) else \
+                    self.title.decode(preferred_encoding, 'replace')
+
+            wenzi = '书籍内容：'
+            date = str(self.last_monday) + '至' + str(self.last_sunday) + '\n期间发行的人民日报'
+            img_data = create_cover(title, [wenzi,date]) #这个列表里面的内容全部会显示在封面上，默认只有date，可以自己加
+            cover_file.write(img_data)
+            cover_file.flush()
+        except:
+            self.log.exception('Failed to generate default cover')
+            return False
+        return True
+
+
+
     """
     本来大部分网站生成标题一般找出正文链接的<a>（定义为link）标签后，就可以通过link.contents[0].strip()来获得正文标题
     但是人民日报<a>标签形式是“<a href="nw.D110000renmrb_20171016_2-01.htm"><script>document.write(view("中共中央召开党外人士座谈会<br>征求对中共十九大报告的意见  "))</script></a>”这种多了script脚本等多余内容的形式
@@ -50,20 +89,10 @@ class renmindaily_week(BasicNewsRecipe):
 
     #下面的函数为recipe必要函数，返回的内容直接用于生成电子书
     def parse_index(self):
-        # from_day为参照基准日。
-        # 如果是从当前日期开始，抓取上一周的报纸则：from_day = datetime.date.today()
-        # 如果指定上周一个日期为参照基准日，抓取上上周的报纸则：datetime.date.today()-datetime.timedelta(days= 7)，即基准日从今天往前推7天
-        # 如果指定上上周一个日期为参照基准日，抓取上上上周报纸则：datetime.date.today()-datetime.timedelta(days= 2*7)，即基准日从今天往前推2个7天。以此类推
-        from_day = datetime.date.today()
-
-        weekday = from_day.weekday()  # 获取指定日期的周的排序, 周一为0, 周日为6
-        # 旅游报周一到周五发行，以下算出日期区间
-        last_monday_delta = weekday + 7  # 当前日期距离上周一的天数差
-        last_sunday_delta = weekday + 1  # 当前日期距离上周五的天数差
 
         ans0 = []
-        for nu in range(last_monday_delta,last_sunday_delta-1,-1): # for循环用于枚举上一个礼拜周一到周五的日期。注意：如果先抓取发行最晚的则写为self.last_sunday_delta , self.last_monday_delta + 1。
-            riqi = from_day - datetime.timedelta(days = nu)
+        for nu in range(self.last_monday_delta,self.last_sunday_delta-1,-1): # for循环用于枚举上一个礼拜周一到周五的日期。注意：如果先抓取发行最晚的则写为self.last_sunday_delta , self.last_monday_delta + 1。
+            riqi = self.from_day - datetime.timedelta(days = nu)
             datetime_t = str(riqi).split('-')  #对日期进行拆分，返回一个['2017', '10', '09']形式的列表
             url_prefix = 'http://paper.people.com.cn/rmrb/html/' #url前缀
             url_prefix_add = 'http://paper.people.com.cn/rmrb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' #url前缀带日期
