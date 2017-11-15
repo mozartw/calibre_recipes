@@ -99,7 +99,6 @@ class yichunyaowen(BasicNewsRecipe):
 
             for link in soup2.findAll('a'):
 
-
                 til = self.get_title(link)
                 url = self.url_prefix + link['href']
                 a = { 'title': til, 'url': url }
