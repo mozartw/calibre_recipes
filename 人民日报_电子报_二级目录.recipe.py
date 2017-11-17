@@ -27,13 +27,12 @@ class renmindaily(BasicNewsRecipe):
     timefmt = '[%Y %b %d %a]'
     # 声明这个订阅列表的作者
     __author__ = 'suchao.personal@gmail.com'
-
+    
+    datetime_t = str(datetime.date.today()).split('-')  #对日期进行拆分，返回一个['2017', '10', '09']形式的列表
     # 以下conversion_options利用calibre自带参数覆写上面的title，让电子书标题显示为"宜春政府网宜春要闻2017-11-13"格式，可以直接看出抓取操作的日期。
     # 也可以直接在title中直接写，但是会造成calibre的GUI recipe界面中标题显示杂乱，不太好看。
     conversion_options = {'title': '人民日报' + '-'.join(datetime_t)}
     
-    datetime_t = str(datetime.date.today()).split('-')  #对日期进行拆分，返回一个['2017', '10', '09']形式的列表
-
     #以下用于抓取当日报纸
     url_prefix = 'http://paper.people.com.cn/rmrb/html/' #url前缀
     url_prefix_add = 'http://paper.people.com.cn/rmrb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' #url前缀带日期
