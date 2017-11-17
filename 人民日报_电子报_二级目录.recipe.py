@@ -73,12 +73,11 @@ class renmindaily(BasicNewsRecipe):
 
     #下面的函数为recipe必要函数，返回的内容直接用于生成电子书
     def parse_index(self):
-        #下面的for循环用soupfind找到各版面的url并生成列表，带pdf的链接抛弃
         soup = self.index_to_soup(self.url_prefix_add2)
         banmiankuai = soup.find('div',{'id':'pageList'}) #可以有多个属性，比如'table',{'cellpadding':'2','width':'100%'}
 
         ans0 = []
-        #下面的for循环依次遍历各个版面的url并生成二级内容
+        #下面的for循环用soupfind找到各版面的url并生成列表，带pdf的链接抛弃
         for link in banmiankuai.findAll('a'):
             articles = []
             if 'pdf' in link['href']:
