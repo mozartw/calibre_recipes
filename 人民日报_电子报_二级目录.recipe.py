@@ -8,24 +8,6 @@ class renmindaily(BasicNewsRecipe):
     description = '抓取人民日报各版面新闻'
     #通过url抓取封面
     #cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
-
-
-    datetime_t = str(datetime.date.today()).split('-')  #对日期进行拆分，返回一个['2017', '10', '09']形式的列表
-
-    #以下用于抓取当日报纸
-    url_prefix = 'http://paper.people.com.cn/rmrb/html/' #url前缀
-    url_prefix_add = 'http://paper.people.com.cn/rmrb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' #url前缀带日期
-    url_prefix_add2 = 'http://paper.people.com.cn/rmrb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' + 'nbs.D110000renmrb_01.htm' #头版完整url
-
-    #以下用于指定下载日期的报纸，而非当日的报纸。与上面的链接二选一
-    #year = '2017'
-    #month = '08'
-    #date = '28'
-    #url_prefix = 'http://paper.people.com.cn/rmrb/html/' #url前缀
-    #url_prefix_add = 'http://paper.people.com.cn/rmrb/html/' + year + '-' + month + '/' + date + '/' #url前缀带日期
-    #url_prefix_add2 = 'http://paper.people.com.cn/rmrb/html/' + year + '-' + month + '/' + date + '/' + 'nbs.D110000renmrb_01.htm' #完整url
-
-
     no_stylesheets = True #不采用页面样式表
     keep_only_tags = [{ 'class': 'text_c' }] #保留的正文部分
     """
@@ -46,11 +28,16 @@ class renmindaily(BasicNewsRecipe):
     # 声明这个订阅列表的作者
     __author__ = 'suchao.personal@gmail.com'
 
-
     # 以下conversion_options利用calibre自带参数覆写上面的title，让电子书标题显示为"宜春政府网宜春要闻2017-11-13"格式，可以直接看出抓取操作的日期。
     # 也可以直接在title中直接写，但是会造成calibre的GUI recipe界面中标题显示杂乱，不太好看。
     conversion_options = {'title': '人民日报' + '-'.join(datetime_t)}
+    
+    datetime_t = str(datetime.date.today()).split('-')  #对日期进行拆分，返回一个['2017', '10', '09']形式的列表
 
+    #以下用于抓取当日报纸
+    url_prefix = 'http://paper.people.com.cn/rmrb/html/' #url前缀
+    url_prefix_add = 'http://paper.people.com.cn/rmrb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' #url前缀带日期
+    url_prefix_add2 = 'http://paper.people.com.cn/rmrb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' + 'nbs.D110000renmrb_01.htm' #头版完整url
 
     # 以下函数用于生成默认封面。关键的是img_data。
     def default_cover(self, cover_file):
