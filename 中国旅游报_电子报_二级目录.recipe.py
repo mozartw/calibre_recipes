@@ -5,7 +5,6 @@ import datetime #导入日期时间模块，各版面的url根据发行日期改
 class zhongguolvyoubao(BasicNewsRecipe):
 
     title = '中国旅游报'
-    description = '抓取当天中国旅游报各版面新闻'
     #通过url抓取封面
     #cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
     no_stylesheets = True #不采用页面样式表
@@ -36,7 +35,7 @@ class zhongguolvyoubao(BasicNewsRecipe):
     # 以下conversion_options利用calibre自带参数覆写上面的title，让电子书标题显示为"宜春政府网宜春要闻2017-11-13"格式，可以直接看出抓取操作的日期。
     # 也可以直接在title中直接写，但是会造成calibre的GUI recipe界面中标题显示杂乱，不太好看。
     conversion_options = {'title': '中国旅游报'.decode('utf8') + '-'.join(datetime_t)} # 不加decode选项在windows中书名会有乱码
-
+    description = '抓取中国旅游报' + '-'.join(datetime_t) + '各版面新闻'
 
     # 以下函数用于生成默认封面。关键的是img_data。
     def default_cover(self, cover_file):

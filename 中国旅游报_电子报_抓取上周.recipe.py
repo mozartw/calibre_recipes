@@ -42,7 +42,7 @@ class zhongguolvyoubao_week(BasicNewsRecipe):
     last_friday = datetime.date.today() - datetime.timedelta(days = last_friday_delta)
 
     week_rank = last_monday.isocalendar() # 返回结果是三元组（年号，第几周，第几天），用于写入书籍标题
-    title = '中国旅游报\n' + str(week_rank[0]) + '年第' + str(week_rank[1]) + '周'
+    title = '中国旅游报' + str(week_rank[0]) + '年第' + str(week_rank[1]) + '周'
 
     # 以下函数用于生成默认封面。关键的是img_data。
     def default_cover(self, cover_file):
