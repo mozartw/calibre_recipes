@@ -7,9 +7,12 @@ class yichunyaowen(BasicNewsRecipe):
     encoding = 'UTF-8'
     datetime_t = str(datetime.date.today()).split('-')  #对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表，如果指定一个具体的日期进行抓取的话写为str(datetime.date(2017, 10, 07)).split('-')，或者直接写一个['2017', '10', '07']列表
     days_delta = 7 # 定义抓取区间，非calibre自带参数，在parse_index(self)中用于判断，具体见下
+    #以下用于算出抓取新闻区间前后两个日期，在封面底端显示：抓取新闻日期区间\n2017-11-6至2017-11-13
+    today = datetime.date(int(datetime_t[0]),int(datetime_t[1]),int(datetime_t[2]))
+    before = datetime.date.today()-datetime.timedelta(days = days_delta)
     title = '宜春政府网宜春要闻'.decode('utf8') + '-'.join(datetime_t) + '前'.decode('utf8') + str(days_delta) + '天'.decode('utf8')
     url_prefix = 'http://www.yichun.gov.cn/zwgk/zwdt/zwyw/'
-    description = '抓取宜春政府网宜春要闻（'.decode('utf8') + url_prefix + '）'.decode('utf8') + '-'.join(datetime_t) + '前'.decode('utf8') + str(days_delta) + '天的新闻'.decode('utf8')
+    description = '抓取宜春政府网宜春要闻（'.decode('utf8') + url_prefix + '）'.decode('utf8') + '-'.join(datetime_t) + '前'.decode('utf8') + str(days_delta) + '天的新闻'.decode('utf8') + str(before) + '至' + str(today)
     no_stylesheets = True
     keep_only_tags = [{ 'style': ' border:3px solid #f0f0f0;' }]
     remove_tags = [dict(name='td', attrs={'style':'font-size:12px;'}),dict(name='td', attrs={'width':'50%'})] #移除上下‘更新时间’和‘信息来源’两个多余元素
@@ -28,14 +31,10 @@ class yichunyaowen(BasicNewsRecipe):
         '''
         Create a generic cover for recipes that don't have a cover
         '''
-        #以下用于算出抓取新闻区间前后两个日期，在封面底端显示：抓取新闻日期区间\n2017-11-6至2017-11-13
-        today = datetime.date(int(self.datetime_t[0]),int(self.datetime_t[1]),int(self.datetime_t[2]))
-        before = datetime.date.today()-datetime.timedelta(days = self.days_delta)
-
         try:
             from calibre.ebooks.covers import create_cover
             title = '宜春政府网宜春要闻'.decode('utf8')
-            date = '抓取新闻日期区间' + '\n' + str(before) + '至' + str(today)
+            date = '抓取新闻日期区间' + '\n' + str(self.before) + '至' + str(self.today)
             img_data = create_cover(title, [date])
             cover_file.write(img_data)
             cover_file.flush()

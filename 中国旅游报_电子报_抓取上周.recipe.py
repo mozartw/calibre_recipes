@@ -3,14 +3,8 @@ import datetime #导入日期时间模块，各版面的url根据发行日期改
 
 
 class zhongguolvyoubao_week(BasicNewsRecipe):
-
-    # title = '中国旅游报_抓取上周'  #书籍和recipe标题，这里因为要用到下面的变量，所以移到底下了。
-
-    description = '抓取指定参照日期前一周的中国旅游报各版面新闻。***参照日期指定的具体办法见recipe当中的from_day变量，默认以当日为参照日，抓取上周'
-    #通过url抓取封面
-    #cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
-
-
+    language = 'zh'
+    encoding = 'UTF-8'
     no_stylesheets = True #不采用页面样式表
     keep_only_tags = [{ 'style': 'height:800px; overflow-y:scroll; width:100%; BORDER: #BDDBF7 1px solid' }] #保留的正文部分
     #移除上下多余元素，典型的web1.0产物
@@ -43,6 +37,7 @@ class zhongguolvyoubao_week(BasicNewsRecipe):
 
     week_rank = last_monday.isocalendar() # 返回结果是三元组（年号，第几周，第几天），用于写入书籍标题
     title = '中国旅游报' + str(week_rank[0]) + '年第' + str(week_rank[1]) + '周'
+    description = '抓取' + str(last_monday) + '至' + str(last_friday) + '期间发行的中国旅游报' + '*****参照日期指定的具体办法见recipe当中的from_day变量，默认以当日为参照日，抓取上周*****'
 
     # 以下函数用于生成默认封面。关键的是img_data。
     def default_cover(self, cover_file):

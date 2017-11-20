@@ -3,14 +3,10 @@ import datetime,re #导入日期时间模块，各版面的url根据发行日期
 
 
 class renmindaily_week(BasicNewsRecipe):
-
-    title = '人民日报_抓取上周'
-    description = '抓取指定参照日期前一周的人民日报各版面新闻。***参照日期指定的具体办法见recipe当中的from_day变量，默认以当日为参照日，抓取上周'
-    #通过url抓取封面
-    #cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
-
-
-
+    language = 'zh'
+    encoding = 'UTF-8'
+    publisher = '人民日报社'
+    publication_type = '报纸'
     no_stylesheets = True #不采用页面样式表
     keep_only_tags = [{ 'class': 'text_c' }] #保留的正文部分
     """
@@ -47,7 +43,7 @@ class renmindaily_week(BasicNewsRecipe):
 
     week_rank = last_monday.isocalendar() # 返回结果是三元组（年号，第几周，第几天），用于写入书籍标题
     title = '人民日报' + str(week_rank[0]) + '年第' + str(week_rank[1]) + '周'
-
+    description = '抓取' + str(last_monday) + '至' + str(last_sunday) + '期间发行的人民' + '*****参照日期指定的具体办法见recipe当中的from_day变量，默认以当日为参照日，抓取上周*****'
     # 以下函数用于生成默认封面。关键的是img_data。
     def default_cover(self, cover_file):
         '''

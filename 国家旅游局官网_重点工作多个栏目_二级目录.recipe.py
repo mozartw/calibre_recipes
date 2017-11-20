@@ -3,12 +3,13 @@ from calibre.web.feeds.recipes import BasicNewsRecipe
 import datetime,re
 
 class chinata(BasicNewsRecipe):
+    language = 'zh'
+    encoding = 'UTF-8'
+    datetime_t = str(datetime.date.today()).split('-')  #对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表
 
-    title = '国家旅游局官网_重点工作多个栏目'
-    description = '抓取国家旅游局官网_重点工作多个栏目' #三个栏目的索引页为三个不同页面，下面用for循环进行归纳
-    #通过url抓取封面
-    #cover_url = 'http://akamaicovers.oreilly.com/images/0636920024972/lrg.jpg'
-
+    days_delta = 7 # 定义抓取区间，非calibre自带参数，在parse_index(self)中用于判断，具体见下
+    title = '国家旅游局官网_重点工作多个栏目'.decode('utf8') + '-'.join(datetime_t) + '前'.decode('utf8') + str(days_delta) + '天'.decode('utf8')
+    description = '抓取国家旅游局官网_重点工作多个栏目'.decode('utf8') +  '-'.join(datetime_t) + '前'.decode('utf8') + str(days_delta) + '天的新闻'.decode('utf8') #三个栏目的索引页为三个不同页面，下面用for循环进行归纳
 
     #定义一个通用的url地址。其他recipe中写的，这里懒得用了，下面直接用字符串
     url_prefix = 'http://www.cnta.gov.cn/zdgz/'
@@ -18,10 +19,10 @@ class chinata(BasicNewsRecipe):
     #delay = 1
     simultaneous_downloads = 10
     remove_javascript = True
-    compress_news_images_auto_size = 16
+    #compress_news_images_auto_size = 16
     #移除上下‘当前位置’和‘关闭本页’两个多余元素，典型的web1.0产物
     #remove_tags = [dict(name='td', attrs={'class':'dang'}),dict(name='table', attrs={'background':"resource/images/djxlyw/mma_12.jpg"})]
-    compress_news_images= True
+    #compress_news_images= True
     #抓取出来的页面文章段落会居中，非常难看，即使在本句当中指定p元素的对齐方式也还是有部分文章依然居中，只能眉毛胡子一把抓，全部分散对齐算了这样做的结果是文章标题也没法居中了
     extra_css = 'p,table,td,tr,div { text-align: justify;}'
     # 在首页所显示的日期格式，缺省格式为日，月，年：timefmt = '[%a, %d %b %Y]'，windows平台上此项不能包含中文字符，否则生成不了有日期的封面。linux下可以
@@ -29,7 +30,28 @@ class chinata(BasicNewsRecipe):
     # 声明这个订阅列表的作者
     __author__ = 'suchao.personal@gmail.com'
 
-    datetime_t = str(datetime.date.today()).split('-')  #对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表
+    # 以下函数用于生成默认封面。关键的是img_data。
+    def default_cover(self, cover_file):
+        '''
+        Create a generic cover for recipes that don't have a cover
+        '''
+        #以下用于算出抓取新闻区间前后两个日期，在封面底端显示：抓取新闻日期区间\n2017-11-6至2017-11-13
+        today = datetime.date(int(self.datetime_t[0]),int(self.datetime_t[1]),int(self.datetime_t[2]))
+        before = datetime.date.today()-datetime.timedelta(days = self.days_delta)
+
+        try:
+            from calibre.ebooks.covers import create_cover
+            title = '国家旅游局重点工作'.decode('utf8')
+            date = '抓取新闻日期区间' + '\n' + str(before) + '至' + str(today)
+            img_data = create_cover(title, [date])
+            cover_file.write(img_data)
+            cover_file.flush()
+        except:
+            self.log.exception('Failed to generate default cover')
+            return False
+        return True
+
+
 
     #定义函数，获得标题
     def get_title(self, link):
@@ -77,27 +99,21 @@ class chinata(BasicNewsRecipe):
                         d1 = datetime.date.today()  # 获取今天的日期
                         d2 = datetime.date(int(month.group(1)), int(month.group(2)), int(month.group(3)))  # 获取新闻的日期
                         days_betwen = (d1 - d2).days #获取时间差，结果为整数
-                        if days_betwen <= 30 : #限定抓取几天内的新闻，当天的则为days_betwen == 0
-                            article_link.append(str(li))  # 注意要转换为字符串，beautifusoup不接受列表和其他类型的数据
+                        if days_betwen <= self.days_delta : #限定抓取几天内的新闻，当天的则为days_betwen == 0
+                            soup3 = self.index_to_soup(str(li))
+                            for link in soup3.findAll('a'):
+                                til = self.get_title(link) + '(发布日期：' + str(d2) + ')'
+                                url = vol_ul + link['href']
+                                #calibre能够识别相对路径，以后相对路径一律不用修改特别是“厕所革命”栏目用的i是../../这种网上跳级的模式，更不能变动
+                                #url = vol_ul + link['href'].lstrip('\./')
+                                a = { 'title':til , 'url': url }
+                                articles.append(a)
+
                     except:
                         pass
-
-            soup3 = self.index_to_soup(''.join(article_link))
-
-            #下面的for循环在上面找出指定日期范围内的正文链接当中提取url链接，并配合'http://www.jxta.gov.cn/'形成最终的正文链接
-            for link in soup3.findAll('a'):
-
-                til = self.get_title(link)
-                url = vol_ul + link['href']
-                #calibre能够识别相对路径，以后相对路径一律不用修改特别是“厕所革命”栏目用的i是../../这种网上跳级的模式，更不能变动
-                #url = vol_ul + link['href'].lstrip('\./')
-                a = { 'title':til , 'url': url }
-
-                articles.append(a)
 
             ans = (vol_tl, articles)
 
             ans0.append(ans)
-
 
         return ans0
