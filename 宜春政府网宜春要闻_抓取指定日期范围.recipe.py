@@ -29,7 +29,7 @@ class yichunyaowen(BasicNewsRecipe):
         Create a generic cover for recipes that don't have a cover
         '''
         #以下用于算出抓取新闻区间前后两个日期，在封面底端显示：抓取新闻日期区间\n2017-11-6至2017-11-13
-        today = datetime.date.today()
+        today = datetime.date(int(self.datetime_t[0]),int(self.datetime_t[1]),int(self.datetime_t[2]))
         before = datetime.date.today()-datetime.timedelta(days = self.days_delta)
 
         try:
