@@ -10,10 +10,13 @@ class jiangxilvyou(BasicNewsRecipe):
     datetime_t = str(datetime.date.today()).split('-')  #对当天日期进行拆分，返回一个['2017', '10', '09']形式的列表
 
     days_delta = 7 # 定义抓取区间，非calibre自带参数，在parse_index(self)中用于判断，具体见下
+    #以下用于算出抓取新闻区间前后两个日期，在封面底端显示：抓取新闻日期区间\n2017-11-6至2017-11-13
+    today = datetime.date(int(datetime_t[0]),int(datetime_t[1]),int(datetime_t[2]))
+    before = datetime.date.today()-datetime.timedelta(days = days_delta)
     title = '江西旅游政务网'.decode('utf8') + '-'.join(datetime_t) + '前'.decode('utf8') + str(days_delta) + '天'.decode('utf8')
-    description = '抓取江西旅游政务网旅游快报、行业新闻、地市动态（'.decode('utf8') + url + '）'.decode('utf8') + '-'.join(datetime_t) + '前'.decode('utf8') + str(days_delta) + '天的新闻'.decode('utf8') #三个栏目的索引页为三个不同页面，下面用for循环进行归纳
+    description = '抓取江西旅游政务网旅游快报、行业新闻、地市动态（'.decode('utf8') + url + '）'.decode('utf8') + '-'.join(datetime_t) + '前'.decode('utf8') + str(days_delta) + '天的新闻'.decode('utf8') + str(before) + '至' + str(today) #三个栏目的索引页为三个不同页面，下面用for循环进行归纳
 
-
+    remove_attributes = ['style', 'font']
     no_stylesheets = True
     max_articles_per_feed  = 999 #最大文章数，默认为100
     keep_only_tags = [{ 'id': 'container' }]
@@ -46,14 +49,11 @@ class jiangxilvyou(BasicNewsRecipe):
         '''
         Create a generic cover for recipes that don't have a cover
         '''
-        #以下用于算出抓取新闻区间前后两个日期，在封面底端显示：抓取新闻日期区间\n2017-11-6至2017-11-13
-        today = datetime.date(int(self.datetime_t[0]),int(self.datetime_t[1]),int(self.datetime_t[2]))
-        before = datetime.date.today()-datetime.timedelta(days = self.days_delta)
 
         try:
             from calibre.ebooks.covers import create_cover
             title = '江西旅游政务网'.decode('utf8')
-            date = '抓取新闻日期区间' + '\n' + str(before) + '至' + str(today)
+            date = '抓取新闻日期区间' + '\n' + str(self.before) + '至' + str(self.today)
             img_data = create_cover(title, [date])
             cover_file.write(img_data)
             cover_file.flush()
@@ -104,8 +104,8 @@ class jiangxilvyou(BasicNewsRecipe):
                                 a = { 'title':til , 'url': url }
 
                                 articles.append(a)
-                except:
-                    pass
+                    except:
+                        pass
 
             ans = (voltitle, articles)
             ans0.append(ans)
