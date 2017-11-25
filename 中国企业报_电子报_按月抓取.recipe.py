@@ -20,10 +20,22 @@ class zqcn(BasicNewsRecipe):
     #以上结束
 
     title = '中国企业报'.decode('utf8') + str(datetime_d.year) + '年' + str(datetime_d.month) + '月'
+<<<<<<< HEAD
     description = '抓取' + str(datetime_d.year) + '年' + str(datetime_d.month) + '月期间发行的中国旅游报。每周二发行一份。更改头部的month变量可以指定不同的抓取月份'
     no_stylesheets = True #不采用页面样式表
     keep_only_tags = [{ 'class': 'content' }] #保留的正文部分
     remove_tags = [dict(name='div', attrs={'class':'title04'})]
+=======
+    description = '抓取' + str(datetime_d.year) + '年' + str(datetime_d.month) + '月期间发行的中国旅游报。每周二发行一份。'
+    no_stylesheets = True #不采用页面样式表
+    keep_only_tags = [{ 'class': 'content' }] #保留的正文部分
+    remove_tags = [dict(name='div', attrs={'class':'title04'})]
+    """
+    从这发现extra_css可以定义多个标签，用空格隔开即可，不可以加逗号，其实就是css的标准，只不过转化为字符串。
+    而且这里的标签指定的是原网页中的标签，而不是抓出来的书里存在的标签。
+    以人民日报为例，抓出来的书并没有h1，h2的标题标签，全换成了p，只在原来的网页中有h1,h2等。
+    """
+>>>>>>> 1de7ac2f2e9bfc416455a50b14d3e0554a028182
     extra_css = 'h1 { font-size: xx-large;}  h2 { font-size: large;}' #抓出来的文章标题太大，把字体改小一点，在人民日报网页中标题是h1标签
     #delay = 1
     #10线程下载
