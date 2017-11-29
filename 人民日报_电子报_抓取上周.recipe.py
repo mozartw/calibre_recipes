@@ -94,20 +94,17 @@ class renmindaily_week(BasicNewsRecipe):
             url_prefix_add = 'http://paper.people.com.cn/rmrb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' #url前缀带日期
             url_prefix_add2 = 'http://paper.people.com.cn/rmrb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' + 'nbs.D110000renmrb_01.htm' #头版完整url
             vol_title = str(riqi)
-
+            articles = []
             #下面的for循环用soupfind找到各版面的url并生成列表，带pdf的链接抛弃
             soup = self.index_to_soup(url_prefix_add2)
             banmiankuai = soup.find('div',{'id':'pageList'}) #可以有多个属性，比如'table',{'cellpadding':'2','width':'100%'}
-            urlist = [] #各版面链接
             for link in banmiankuai.findAll('a'):
                 if 'pdf' in link['href']:
                     continue
-                urlist.append(url_prefix_add + link['href'].lstrip(r'./'))
-                #这个articles列表必须放在这个位置，放下下面的for循环里面会造成最终结果缺少东西，试了很多次的结果，原因待分析
-                articles = []
+                banmianurl = url_prefix_add + link['href'].lstrip(r'./')
+                banmiantitle = link.contents[0].strip() # 版面标题，比如“第01版_要闻”
                 #下面的for循环用于给soup.find提供多个参数,即包含最终文章的链接网页框架
-            for ur in urlist:
-                soup = self.index_to_soup(ur)
+                soup = self.index_to_soup(banmianurl)
                 div = soup.find('div',{'id':'titleList'})#抓取的正文链接框架部分
 
 
@@ -121,7 +118,7 @@ class renmindaily_week(BasicNewsRecipe):
                     vlinkfind = videolink.findall(str(link2))
 
                     if not vlinkfind:
-                        til = self.get_title(link2)
+                        til = banmiantitle + '_' + self.get_title(link2) #在文章标题前加入版面标题
                         url = url_prefix_add + link2['href']
                         a = { 'title':til , 'url': url }
 
