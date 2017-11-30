@@ -1,10 +1,12 @@
 from calibre.web.feeds.recipes import BasicNewsRecipe
-import datetime #导入日期时间模块，各版面的url根据发行日期改变。
+import datetime,re #导入日期时间模块，各版面的url根据发行日期改变。
 
 
 class zhongguolvyoubao_week(BasicNewsRecipe):
     language = 'zh'
     encoding = 'UTF-8'
+    publisher = '人民日报社'
+    publication_type = '报纸'
     no_stylesheets = True #不采用页面样式表
     keep_only_tags = [{ 'style': 'height:800px; overflow-y:scroll; width:100%; BORDER: #BDDBF7 1px solid' }] #保留的正文部分
     #移除上下多余元素，典型的web1.0产物
@@ -72,25 +74,24 @@ class zhongguolvyoubao_week(BasicNewsRecipe):
             url_prefix_add = 'http://news.ctnews.com.cn/zglyb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' #url前缀带日期
             url_prefix_add2 = 'http://news.ctnews.com.cn/zglyb/html/' + datetime_t[0] + '-' + datetime_t[1] + '/' + datetime_t[2] + '/' + 'node_1.htm' #完整url
             vol_title = str(riqi)
+            simpleriqi = r'(' + str(riqi.month) + r'.' + str(riqi.day) + r')'
             #下面的for循环用soupfind找到各版面的url并生成列表，带pdf的链接抛弃
             soup = self.index_to_soup(url_prefix_add2)
             banmiankuai = soup.find('table',{'cellpadding':'2','width':'100%'})
-            urlist = [] #各版面链接
+            articles = []
             for link in banmiankuai.findAll('a'):
                 if 'pdf' in link['href']:
                     continue
-                urlist.append(url_prefix_add + link['href'].lstrip(r'./'))
-                #这个articles列表必须放在这个位置，放下下面的for循环里面会造成最终结果缺少东西，试了很多次的结果，原因待分析
-            articles = []
-            #下面的for循环用于给soup.find提供多个参数,即包含最终文章的链接网页框架
-            for ur in urlist:
-                soup = self.index_to_soup(ur)
+                banmiantitle = link.contents[0].strip() # 版面标题，比如“第08版：旅游报08版”
+                find_siplebanmiantitle = re.compile(r'第(\d*版)：') # 去掉版面标题中多余元素，避免过长
+                siplebanmiantitle = find_siplebanmiantitle.search(str(banmiantitle)).group(1) # 去掉版面标题中多余元素，避免过长
+                soup = self.index_to_soup(url_prefix_add + link['href'].lstrip(r'./'))
                 td = soup.find('ul',{'class':'ul02_l'})#抓取的正文链接框架部分
 
 
                 for link2 in td.findAll('a'):
                     #contens[]是BeautifulSoup的一个属性，我理解为用于去除标签，两层标签就来两次contents[0]，详见https://www.crummy.com/software/BeautifulSoup/bs4/doc.zh/。strip() 是通用字符串方法，不加参数则用于去除头尾空格
-                    til = link2.contents[0].contents[0].strip()
+                    til = siplebanmiantitle + '_' + link2.contents[0].contents[0].strip() + simpleriqi
                     url = url_prefix_add + link2['href']
                     a = { 'title':til , 'url': url }
 
